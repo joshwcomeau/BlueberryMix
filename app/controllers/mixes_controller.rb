@@ -11,7 +11,8 @@ class MixesController < ApplicationController
   end
 
   def show
-
+    filename = params[:id] + ".mp3"
+    @mix = AWS::S3::S3Object.find(filename, @bucket)
   end
 
   def create
