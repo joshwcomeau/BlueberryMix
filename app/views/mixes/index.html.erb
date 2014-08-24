@@ -1,1 +1,7 @@
 <h2>Mixes index</h2>
+
+<ul>
+<% @mixes.each do |mix| %>
+   <li><%= mix.key %> - <%= link_to "Delete",  mix_path(mix.key), method: :delete, confirm: 'Are you sure you want to delete ' + mix.key + '?' %></li>
+<% end %>
+</ul>
