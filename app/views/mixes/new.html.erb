@@ -1,1 +1,6 @@
-new.html.erb
+<h2>Add New Mix</h2>
+
+<%= form_tag mixes_path, :method => "post", :multipart => true do %>
+    <%= file_field_tag "mix" %>
+    <%= submit_tag "Upload" %>
+<% end %>
