@@ -10,11 +10,16 @@ class MixesController < ApplicationController
 
   end
 
+  def show
+
+  end
+
   def create
     filename = sanitize_filename(params[:mix].original_filename)
-    if AWS::S3::S3Object.store(filename, params[:mix].read, @bucket, :access => :public_read)
+    begin 
+      AWS::S3::S3Object.store(filename, params[:mix].read, @bucket, :access => :public_read)
       redirect_to root_path
-    else
+    rescue
       render :new, alert: "Upload failed"
     end
 
@@ -22,12 +27,16 @@ class MixesController < ApplicationController
   end
 
   def destroy
-    if (params[:id])
+    if params[:id]
       filename = params[:id] + "." + params[:format]
-      AWS::S3::S3Object.find(filename, @bucket).delete
-      redirect_to root_path, notice: "File deleted!"
+      begin
+        AWS::S3::S3Object.find(filename, @bucket).delete
+        redirect_to root_path, notice: "File deleted!"
+      rescue
+        render :index, alert: 'Song could not be deleted'
+      end
     else
-      render text: "No song was found to delete!"
+      redirect_to root_path, alert: 'Song not found.'
     end
   end
 
