@@ -1,6 +1,7 @@
 <h2>Add New Mix</h2>
 
 <%= form_tag mixes_path, :method => "post", :multipart => true do %>
-    <%= file_field_tag "mix" %>
+    <%= text_field_tag "name" %><br>
+    <%= file_field_tag "mix" %><br>
     <%= submit_tag "Upload" %>
 <% end %>

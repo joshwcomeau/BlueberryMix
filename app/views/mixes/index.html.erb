@@ -2,7 +2,7 @@
 
 <ul>
 <% @mixes.each do |mix| %>
-   <li><%= link_to mix.key, mix_path(mix.key) %> - <%= link_to "Delete",  mix_path(mix.key), method: :delete, confirm: 'Are you sure you want to delete ' + mix.key + '?' %></li>
+   <li><%= link_to mix.name, mix_path(mix) %> - <%= link_to "Delete",  mix_path(mix), method: :delete, confirm: 'Are you sure you want to delete ' + mix.name + '?' %></li>
 <% end %>
 </ul>
 

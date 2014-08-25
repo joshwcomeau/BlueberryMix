@@ -1,9 +1,15 @@
 class MixesController < ApplicationController
   before_action :get_bucket
+  before_action :get_mix, only: [:show, :destroy]
+
+  # Right now, we're fetching objects direct from S3. We want to tie these objects with our own database,
+  # So that we can include attached metadata.
+
+  # Initial strategy: Create a 'Mix' object in postgres, storing the user-specified title as well as the sanitized
+  # filename as the 's3_key'. Use that key to store in S3, and do the reverse when fetching.
 
   def index
-    @mixes = AWS::S3::Bucket.find(@bucket).objects
-
+    @mixes = Mix.all
   end
 
   def new
@@ -11,14 +17,20 @@ class MixesController < ApplicationController
   end
 
   def show
-    filename = params[:id] + ".mp3"
-    @mix = AWS::S3::S3Object.find(filename, @bucket)
+    @mix_obj = AWS::S3::S3Object.find(@mix.s3_path, @bucket)
   end
 
   def create
     filename = sanitize_filename(params[:mix].original_filename)
+    
+    @mix = current_user.mixes.new(
+      name:     params[:name],
+      s3_path:  filename
+    )
+    
+
     begin 
-      AWS::S3::S3Object.store(filename, params[:mix].read, @bucket, :access => :public_read)
+      AWS::S3::S3Object.store(filename, params[:mix].read, @bucket, :access => :public_read) && @mix.save!
       redirect_to root_path
     rescue
       render :new, alert: "Upload failed"
@@ -28,16 +40,11 @@ class MixesController < ApplicationController
   end
 
   def destroy
-    if params[:id]
-      filename = params[:id] + "." + params[:format]
-      begin
-        AWS::S3::S3Object.find(filename, @bucket).delete
-        redirect_to root_path, notice: "File deleted!"
-      rescue
-        render :index, alert: 'Song could not be deleted'
-      end
-    else
-      redirect_to root_path, alert: 'Song not found.'
+    begin
+      AWS::S3::S3Object.find(@mix.s3_path, @bucket).delete && @mix.destroy
+      redirect_to root_path, notice: "File deleted!"
+    rescue
+      render :index, alert: 'Song could not be deleted'
     end
   end
 
@@ -46,6 +53,10 @@ class MixesController < ApplicationController
   def get_bucket
     @bucket = ENV["S3_BUCKET"]
   end
+
+  def get_mix
+    @mix = Mix.find(params[:id])
+  end 
 
   def sanitize_filename(filename)
     returning filename.strip do |name|

@@ -7,6 +7,7 @@
 #  user_id    :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  s3_path    :string(255)
 #
 
 class Mix < ActiveRecord::Base
