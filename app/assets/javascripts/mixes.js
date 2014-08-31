@@ -2,17 +2,24 @@ $(document).ready(function() {
   console.log("loaded");
   // Only fire on pages that have a set player.
   if ( $(".set_player").length ) {
-    var audioSection = $('.set_player');
 
-    var audio = $('<audio>', {
-         controls : 'controls'
+
+
+    var url = $(".set_player").data('url');
+
+    var wavesurfer = Object.create(WaveSurfer);
+
+    wavesurfer.init({
+        container: document.querySelector('.set_player'),
+        waveColor: 'violet',
+        progressColor: 'purple',
+        normalize: true
     });
 
-    console.log(this)
+    wavesurfer.on('ready', function () {
+        wavesurfer.play();
+    });
 
-    var url = audioSection.data('url');
-    $('<source>').attr('src', url).appendTo(audio);
-    audioSection.html(audio);
-    return false;
+    wavesurfer.load(url);
   }
 });

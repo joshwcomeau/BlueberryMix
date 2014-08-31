@@ -18,4 +18,8 @@ gem 'omniauth'
 gem 'aws-s3',     require: 'aws/s3'
 gem 'annotate'
 gem 'pry',        group: :development
-gem 'pry-byebug', group: :development 
+gem 'pry-byebug', group: :development
+
+# gem 'ruby-audio'
+# gem 'oily_png'
+# gem 'waveform' 
